@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("MORADOR")
+  createdAt DateTime @default(now())
+}
+
+model Morador {
+  id             Int        @id @default(autoincrement())
+  name           String
+  telefone       String?
+  apartamentoId  Int?
+  apartamento    Apartment? @relation(fields: [apartamentoId], references: [id])
+}
+
+model Apartment {
+  id       Int       @id @default(autoincrement())
+  numero   String
+  bloco    String?
+  moradores Morador[]
+}
+
+model Imovel {
+  id           Int      @id @default(autoincrement())
+  titulo       String
+  descricao    String
+  tipo         String
+  valor        Float
+  quartos      Int
+  banheiros    Int
+  vagas        Int
+  area         Float
+  proprietario String
+  telefone     String
+  criadoEm     DateTime @default(now())
+  fotos        Foto[]
+}
+
+model Foto {
+  id        Int     @id @default(autoincrement())
+  url       String
+  imovelId  Int?
+  imovel    Imovel? @relation(fields: [imovelId], references: [id])
+}
+
+model Reclamacao {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  apartamento  String
+  assunto      String
+  descricao    String
+  data         DateTime @default(now())
+  lido         Boolean  @default(false)
+}
+
+model CategoriaFinanceira {
+  id   Int    @id @default(autoincrement())
+  nome String
+  lancamentos Lancamento[]
+}
+
+model Lancamento {
+  id            Int                  @id @default(autoincrement())
+  data          DateTime
+  tipo          String
+  descricao     String
+  categoriaId   Int?
+  categoria     CategoriaFinanceira? @relation(fields: [categoriaId], references: [id])
+  valor         Float
+  anexoId       Int?                 @unique
+  anexo         Anexo?               @relation(fields: [anexoId], references: [id])
+}
+
+model Anexo {
+  id   Int    @id @default(autoincrement())
+  url  String
+  nome String
+  lancamento Lancamento?
+}
+
+model FundoReserva {
+  id     Int      @id @default(autoincrement())
+  valor  Float    @default(0)
+  criado DateTime @default(now())
+}
+
+model Log {
+  id       Int      @id @default(autoincrement())
+  mensagem String
+  criado   DateTime @default(now())
+}
