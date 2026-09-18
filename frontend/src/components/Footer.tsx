@@ -1,6 +1,17 @@
 import React from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 export default function Footer() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  function handleHashClick(event: React.MouseEvent<HTMLAnchorElement>, hash: string) {
+    if (location.pathname !== '/') {
+      event.preventDefault()
+      navigate(`/${hash}`)
+    }
+  }
+
   return (
     <footer className="site-footer">
       <div className="container footer-grid">
@@ -8,13 +19,13 @@ export default function Footer() {
           <strong>Onde estamos</strong>
           <p>R. Des. José Gomes da Costa, 1887</p>
           <p>Capim Macio · Natal/RN</p>
-          <a href="/#contacts">Entre em contato →</a>
+          <a href="/#contacts" onClick={event => handleHashClick(event, '#contacts')}>Entre em contato →</a>
         </div>
         <nav className="footer-links" aria-label="Links úteis">
           <strong>Links úteis</strong>
-          <a href="/transparencia">Portal da transparência</a>
-          <a href="/reclamacoes">Reclamações</a>
-          <a href="/#imoveis">Imóveis</a>
+          <Link to="/transparencia">Portal da transparência</Link>
+          <Link to="/reclamacoes">Reclamações</Link>
+          <a href="/#imoveis" onClick={event => handleHashClick(event, '#imoveis')}>Imóveis</a>
         </nav>
         <div className="footer-brand">
           <strong>Condomínio Sol e Mar</strong>
