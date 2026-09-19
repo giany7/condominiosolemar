@@ -18,17 +18,17 @@ export default function Header() {
   return (
     <header className={`site-header${location.pathname === '/' ? ' home-header' : ''}`}>
       <div className="container">
-        <a className="brand" href="/">
+        <Link className="brand" to="/">
           <img className="brand-logo" src="/logo-sol-e-mar.svg" alt="Logo Sol e Mar" />
           <span>Condomínio Sol e Mar</span>
-        </a>
+        </Link>
         <nav>
           <a href="/#history" onClick={event => handleHashClick(event, '#history')}>História</a>
           <a href="/#imoveis" onClick={event => handleHashClick(event, '#imoveis')}>Imóveis</a>
           <a href="/#contacts" onClick={event => handleHashClick(event, '#contacts')}>Contato</a>
           {!isPortaria && <>
-            <a href="/reclamacoes">Reclamações</a>
-            <a href="/transparencia">Portal da Transparência</a>
+            <Link to="/reclamacoes">Reclamações</Link>
+            <Link to="/transparencia">Portal da Transparência</Link>
           </>}
           <Link to={residentPath} className="btn">{isPortaria ? 'Área da Portaria' : 'Área do Morador'}</Link>
         </nav>

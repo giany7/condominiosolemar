@@ -19,11 +19,21 @@ function PendingApproval() {
   )
 }
 
+function SessionLoading() {
+  return (
+    <div className="site-root">
+      <Header />
+      <main className="container dashboard-loading">Carregando sessão...</main>
+      <Footer />
+    </div>
+  )
+}
+
 export default function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { loading, isAuthenticated } = useAuth()
   const location = useLocation()
 
-  if (loading) return <div className="container">Carregando sessão...</div>
+  if (loading) return <SessionLoading />
   if (!isAuthenticated) return <Navigate to="/login" state={{ from: location.pathname }} replace />
 
   return children
@@ -33,7 +43,7 @@ export function ResidentRoute({ children }: { children: JSX.Element }) {
   const { loading, isAuthenticated, isApproved, isPortaria } = useAuth()
   const location = useLocation()
 
-  if (loading) return <div className="container">Carregando sessão...</div>
+  if (loading) return <SessionLoading />
   if (!isAuthenticated) return <Navigate to="/login" state={{ from: location.pathname }} replace />
   if (isPortaria) return <Navigate to="/portaria" replace />
   if (!isApproved) return <PendingApproval />
@@ -45,7 +55,7 @@ export function PortariaRoute({ children }: { children: JSX.Element }) {
   const { loading, isAuthenticated, isPortaria } = useAuth()
   const location = useLocation()
 
-  if (loading) return <div className="container">Carregando sessão...</div>
+  if (loading) return <SessionLoading />
   if (!isAuthenticated) return <Navigate to="/login" state={{ from: location.pathname }} replace />
   if (!isPortaria) return <Navigate to="/dashboard" replace />
 
