@@ -1,0 +1,15 @@
+{
+  "name": "Condomínio Sol e Mar",
+  "short_name": "Sol e Mar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#223366",
+  "theme_color": "#223366",
+  "icons": [
+    {
+      "src": "/logo-sol-e-mar.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
