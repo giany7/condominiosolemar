@@ -23,6 +23,7 @@ export default function AnunciarServicos() {
   const [form, setForm] = useState({ name: '', description: '', phone: '' })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [pendingDelete, setPendingDelete] = useState<ServiceAd | null>(null)
 
   useEffect(() => {
     if (!session?.user.id) return
@@ -68,8 +69,9 @@ export default function AnunciarServicos() {
     loadAds()
   }
 
-  async function handleDelete(id: number) {
-    await supabase.from('service_ads').delete().eq('id', id)
+  async function handleDelete(ad: ServiceAd) {
+    await supabase.from('service_ads').delete().eq('id', ad.id)
+    setPendingDelete(null)
     loadAds()
   }
 
@@ -98,10 +100,11 @@ export default function AnunciarServicos() {
           {ads.length >= 6 && <div className="service-limit-warning" role="status">Você já possui 6 anúncios. Exclua um anúncio para adicionar mais.</div>}
           {error && <div className="error" role="alert">{error}</div>}
           {success && <div className="success" role="status">{success}</div>}
-          <div className="service-manager-list">{ads.map(ad => <article className="service-manager-item" key={ad.id}><div><strong>{ad.name}</strong><span>{ad.description}</span><small>{ad.phone}</small></div><button type="button" onClick={() => handleDelete(ad.id)}>Excluir</button></article>)}</div>
+          <div className="service-manager-list">{ads.map(ad => <article className="service-manager-item" key={ad.id}><div><strong>{ad.name}</strong><span>{ad.description}</span><small>{ad.phone}</small></div><button type="button" onClick={() => setPendingDelete(ad)}>Excluir</button></article>)}</div>
         </section>
       </main>
       <Footer />
+      {pendingDelete && <div className="delete-dialog-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPendingDelete(null) }}><section className="delete-dialog" role="alertdialog" aria-modal="true"><div className="delete-dialog-icon">!</div><h2>Excluir serviço?</h2><p>Tem certeza que deseja excluir o anúncio <strong>{pendingDelete.name}</strong>? Esta ação é permanente.</p><div className="delete-dialog-actions"><button type="button" className="delete-dialog-cancel" onClick={() => setPendingDelete(null)}>Cancelar</button><button type="button" className="delete-dialog-confirm" onClick={() => handleDelete(pendingDelete)}>Sim, excluir</button></div></section></div>}
     </div>
   )
 }

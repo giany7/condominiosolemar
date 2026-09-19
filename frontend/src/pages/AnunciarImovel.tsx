@@ -52,6 +52,7 @@ export default function AnunciarImovel() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [pendingDelete, setPendingDelete] = useState<PropertyAd | null>(null)
 
   useEffect(() => {
     if (!session?.user.id) return
@@ -130,15 +131,16 @@ export default function AnunciarImovel() {
     setSaving(false)
   }
 
-  async function deleteAd(id: number) {
+  async function deleteAd(ad: PropertyAd) {
     setError('')
-    const { error: deleteError } = await supabase.from('property_ads').delete().eq('id', id).eq('created_by', session?.user.id)
+    const { error: deleteError } = await supabase.from('property_ads').delete().eq('id', ad.id).eq('created_by', session?.user.id)
     if (deleteError) {
       setError(deleteError.message)
       return
     }
-    setAds(current => current.filter(ad => ad.id !== id))
+    setAds(current => current.filter(item => item.id !== ad.id))
     setSuccess('Anúncio excluído. Você já pode cadastrar outro imóvel.')
+    setPendingDelete(null)
   }
 
   async function handleLogout() {
@@ -178,9 +180,10 @@ export default function AnunciarImovel() {
             <button type="submit" disabled={saving || loading || ads.length >= MAX_ADS}>{saving ? 'Salvando...' : ads.length >= MAX_ADS ? 'Limite atingido' : 'Publicar anúncio'}</button>
           </form>
         </section>
-        <section className="property-list"><div className="section-heading"><div><span className="section-label">Seus anúncios</span><h2>Imóveis publicados</h2></div></div>{ads.length === 0 && !loading && <div className="dashboard-empty"><strong>Você ainda não possui anúncios.</strong><span>Cadastre seu primeiro imóvel acima.</span></div>}<div className="property-list-grid">{ads.map(ad => <article className="property-ad-card" key={ad.id}>{ad.photos[0] && <img src={ad.photos[0]} alt="" /> }<div><span className="card-tag">{ad.type}</span><h3>{ad.title}</h3><p>{ad.description}</p><strong>{ad.price}</strong><small>{ad.contact}</small><button className="property-delete" type="button" onClick={() => deleteAd(ad.id)}>Excluir anúncio</button></div></article>)}</div></section>
+        <section className="property-list"><div className="section-heading"><div><span className="section-label">Seus anúncios</span><h2>Imóveis publicados</h2></div></div>{ads.length === 0 && !loading && <div className="dashboard-empty"><strong>Você ainda não possui anúncios.</strong><span>Cadastre seu primeiro imóvel acima.</span></div>}<div className="property-list-grid">{ads.map(ad => <article className="property-ad-card" key={ad.id}>{ad.photos[0] && <img src={ad.photos[0]} alt="" /> }<div><span className="card-tag">{ad.type}</span><h3>{ad.title}</h3><p>{ad.description}</p><strong>{ad.price}</strong><small>{ad.contact}</small><button className="property-delete" type="button" onClick={() => setPendingDelete(ad)}>Excluir anúncio</button></div></article>)}</div></section>
       </main>
       <Footer />
+      {pendingDelete && <div className="delete-dialog-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPendingDelete(null) }}><section className="delete-dialog" role="alertdialog" aria-modal="true"><div className="delete-dialog-icon">!</div><h2>Excluir imóvel?</h2><p>Tem certeza que deseja excluir o anúncio <strong>{pendingDelete.title}</strong>? Esta ação é permanente.</p><div className="delete-dialog-actions"><button type="button" className="delete-dialog-cancel" onClick={() => setPendingDelete(null)}>Cancelar</button><button type="button" className="delete-dialog-confirm" onClick={() => deleteAd(pendingDelete)}>Sim, excluir</button></div></section></div>}
     </div>
   )
 }
