@@ -105,11 +105,7 @@ export default function Home() {
       <Header />
       <main className="home-page">
         <section className="banner">
-          <picture>
-            <source media="(max-width: 780px)" srcSet="/solemar-banner2-mobile.webp" type="image/webp" />
-            <source srcSet="/solemar-banner2.webp" type="image/webp" />
-            <img className="banner-photo" src="/solemar-banner2.png" alt="" width={1600} height={829} fetchPriority="high" decoding="async" />
-          </picture>
+          <img className="banner-photo" src="/solemar-banner2.png" alt="" width={1600} height={829} fetchPriority="high" decoding="async" />
           <h1 className="banner-title section-label">Sol e Mar</h1>
         </section>
 
