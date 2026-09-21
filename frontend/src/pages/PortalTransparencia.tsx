@@ -69,18 +69,25 @@ function formatMoneyInput(value: number | string) {
   const rawValue = String(value ?? '').trim()
   if (!rawValue) return ''
 
-  const normalized = rawValue
+  const numericValue = Number(rawValue
     .replace(/\s+/g, '')
     .replace(/\./g, '')
-    .replace(',', '.')
+    .replace(',', '.'))
 
-  const numericValue = Number(normalized)
   if (!Number.isFinite(numericValue)) return rawValue
 
   return numericValue.toLocaleString('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })
+}
+
+function sanitizeMoneyInput(value: string) {
+  return value
+    .replace(/[^\d,.-]/g, '')
+    .replace(/(\..*)\./g, '$1')
+    .replace(/,(?=.*?,)/g, '')
+    .replace(/-(?=.*-)/g, '')
 }
 
 function parseMoneyInput(value: string) {
@@ -603,7 +610,8 @@ export default function PortalTransparencia() {
             <input
               id="inline-entry-value"
               value={draft.value}
-              onChange={event => updateDraft('value', formatMoneyInput(event.target.value))}
+              onChange={event => updateDraft('value', sanitizeMoneyInput(event.target.value))}
+              onBlur={() => updateDraft('value', formatMoneyInput(draft.value))}
               onKeyDown={handleEditorKeyDown}
               inputMode="decimal"
               placeholder="0,00"
