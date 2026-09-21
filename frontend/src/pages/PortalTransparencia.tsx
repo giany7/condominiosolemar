@@ -65,6 +65,37 @@ function formatCurrency(value: number) {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
+function formatMoneyInput(value: number | string) {
+  const rawValue = String(value ?? '').trim()
+  if (!rawValue) return ''
+
+  const normalized = rawValue
+    .replace(/\s+/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.')
+
+  const numericValue = Number(normalized)
+  if (!Number.isFinite(numericValue)) return rawValue
+
+  return numericValue.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
+}
+
+function parseMoneyInput(value: string) {
+  const normalized = value
+    .replace(/\s+/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.')
+    .replace(/[^\d.-]/g, '')
+
+  if (!normalized) return NaN
+
+  const numericValue = Number(normalized)
+  return Number.isFinite(numericValue) ? numericValue : NaN
+}
+
 function formatEntryDate(value: string) {
   return new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR')
 }
@@ -400,7 +431,7 @@ export default function PortalTransparencia() {
       type: entry.type,
       description: entry.description,
       category: entry.category,
-      value: String(entry.value).replace('.', ',')
+      value: formatMoneyInput(entry.value)
     })
     setImportStatus('')
   }
@@ -412,7 +443,7 @@ export default function PortalTransparencia() {
   async function saveDraft() {
     if (editingId === null) return
     setError('')
-    const numericValue = Number(draft.value.replace(/\./g, '').replace(',', '.'))
+    const numericValue = parseMoneyInput(draft.value)
     if (!draft.description.trim() || !draft.category.trim() || !Number.isFinite(numericValue) || numericValue < 0) {
       setError('Preencha data, descrição, categoria e um valor válido.')
       return
@@ -572,7 +603,7 @@ export default function PortalTransparencia() {
             <input
               id="inline-entry-value"
               value={draft.value}
-              onChange={event => updateDraft('value', event.target.value)}
+              onChange={event => updateDraft('value', formatMoneyInput(event.target.value))}
               onKeyDown={handleEditorKeyDown}
               inputMode="decimal"
               placeholder="0,00"
